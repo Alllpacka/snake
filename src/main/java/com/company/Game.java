@@ -1,12 +1,15 @@
 package com.company;
 
-public class Game {
+import java.util.Date;
+
+public class Game implements Runnable {
     public final int width;
     public final int height;
 
     public Area area;
     public Snake snake;
     private boolean gameOver;
+    private int timeBetweenTick = 200;
 
     public Game() {
         this.width = 8;
@@ -36,11 +39,12 @@ public class Game {
     }
 
     private void gameLoop() {
-        while (!gameOver) {
+        Thread gameLoop = new Thread(this);
+        gameLoop.start();
+    }
 
-
-            draw();
-        }
+    private void tick(){
+        draw();
     }
 
     private void spawnCoin() {
@@ -72,5 +76,21 @@ public class Game {
         }
 
         System.out.print("| \n");
+    }
+
+    @Override
+    public void run() {
+        Date startTime = new Date();
+        Date currentTime;
+
+        while (!gameOver) {
+            System.out.print("");
+            currentTime = new Date();
+
+            if ((currentTime.getTime() - startTime.getTime()) >= timeBetweenTick) {
+                startTime.setTime(startTime.getTime() + timeBetweenTick);
+                tick();
+            }
+        }
     }
 }
