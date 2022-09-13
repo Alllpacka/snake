@@ -30,6 +30,10 @@ public class Snake {
         return head;
     }
 
+    public void move() {
+
+    }
+
     public void grow() {
 
     }

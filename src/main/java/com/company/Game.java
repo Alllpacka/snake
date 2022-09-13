@@ -1,14 +1,11 @@
 package com.company;
 
-import java.util.Random;
-
 public class Game {
     public final int width;
     public final int height;
 
-    private Area area;
-    private Snake snake;
-
+    public Area area;
+    public Snake snake;
     private boolean gameOver;
 
     public Game() {
@@ -40,6 +37,7 @@ public class Game {
 
     private void gameLoop() {
         while (!gameOver) {
+
 
             draw();
         }
