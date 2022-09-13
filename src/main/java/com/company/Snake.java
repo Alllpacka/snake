@@ -29,4 +29,8 @@ public class Snake {
     public Point getHeadPoint() {
         return head;
     }
+
+    public void grow() {
+
+    }
 }
