@@ -94,5 +94,17 @@ public class Snake {
                 " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |  |_|\n" +
                 "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|  (_)\n" +
                 "                                                      ");
+        var scan = new java.util.Scanner(System.in);
+        char input = ' ';
+        while (input != '1') {
+            System.out.println("Drücke 0 um zu beenden");
+            System.out.println("Drücke 1 um neuzustarten");
+            input = scan.nextLine().charAt(0);
+            if (input == '0') {
+                System.exit(0);
+            } else if (input == '1') {
+                System.out.println("Restarting...");
+            }
+        }
     }
 }
