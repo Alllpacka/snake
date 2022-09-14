@@ -6,18 +6,14 @@ import java.util.LinkedList;
 public class Snake {
     private LinkedList<Point> body;
     private Point head;
-    private Area area;
-    private Game game;
 
     private Point lastHeadPoint;
 
     private boolean grow;
 
-    public Snake(Point head, Area area, Game game) {
+    public Snake(Point head) {
         body = new LinkedList<>();
         this.head = head;
-        this.area = area;
-        this.game = game;
     }
 
     public void addBodyPoint() {
@@ -25,7 +21,7 @@ public class Snake {
     }
 
     public void removeLastBodyPoint() {
-        area.setField(body.get(0), Type.Void);
+        Main.game.area.setField(body.get(0), Type.Void);
         body.remove(0);
     }
 
@@ -45,32 +41,42 @@ public class Snake {
             addBodyPoint();
             removeLastBodyPoint();
         }
+
         switch (direction) {
             case Up -> {
-                area.setField(this.getHeadPoint(), Type.Void);
+                Main.game.area.setField(this.getHeadPoint(), Type.Void);
                 if (this.head.getY() - 1 >= 0) {
                     this.head.setY(this.head.getY() - 1);
+                } else {
+                    gameOver();
                 }
             }
             case Left -> {
-                area.setField(this.getHeadPoint(), Type.Void);
+                Main.game.area.setField(this.getHeadPoint(), Type.Void);
                 if (this.head.getX() - 1 >= 0) {
                     this.head.setX(this.head.getX() - 1);
+                } else {
+                    gameOver();
                 }
             }
             case Down -> {
-                area.setField(this.getHeadPoint(), Type.Void);
-                if (this.head.getY() - 1 <= game.height) {
+                Main.game.area.setField(this.getHeadPoint(), Type.Void);
+                if (this.head.getY() + 1 <= Main.game.height-1) {
                     this.head.setY(this.head.getY() + 1);
+                } else {
+                    gameOver();
                 }
             }
             case Right -> {
-                area.setField(this.getHeadPoint(), Type.Void);
-                if (this.head.getX() - 1 <= game.width) {
+                Main.game.area.setField(this.getHeadPoint(), Type.Void);
+                if (this.head.getX() + 1 <= Main.game.width-1) {
                     this.head.setX(this.head.getX() + 1);
+                } else {
+                    gameOver();
                 }
             }
         }
+
         lastHeadPoint = new Point(head.getX(), head.getY());
         grow = false;
     }
@@ -78,5 +84,15 @@ public class Snake {
     public void grow() {
         grow = true;
         body.add(lastHeadPoint);
+    }
+
+    private void gameOver(){
+        Main.game.gameOver = true;
+        System.out.println("   ____                         ___                 _ \n" +
+                "  / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __| |\n" +
+                " | |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__| |\n" +
+                " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |  |_|\n" +
+                "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|  (_)\n" +
+                "                                                      ");
     }
 }

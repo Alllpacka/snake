@@ -10,12 +10,12 @@ public class Game implements Runnable {
     private Point coinPoint;
     public Area area;
     public Snake snake;
-    private boolean gameOver;
+    public boolean gameOver;
     private int timeBetweenTick = 800;
 
     public Game() {
         this.width = 16;
-        this.height = 8;
+        this.height = 12;
     }
 
     public Game(int size) {
@@ -52,7 +52,7 @@ public class Game implements Runnable {
     }
 
     private void spawnPlayer() {
-        snake = new Snake(new Point(width / 2, height / 2), area, this);
+        snake = new Snake(new Point(width / 2, height / 2));
         area.setField(snake.getHeadPoint(), Type.Head);
     }
 
@@ -63,8 +63,10 @@ public class Game implements Runnable {
 
     private void tick() {
         move();
-        checkCoin();
-        draw();
+        if (!gameOver) {
+            checkCoin();
+            draw();
+        }
     }
 
     private void spawnCoin() {

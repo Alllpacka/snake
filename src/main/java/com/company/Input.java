@@ -11,12 +11,6 @@ import java.util.logging.Logger;
 
 public class Input implements NativeKeyListener {
 
-    private Snake snake;
-
-    public Input(Snake snake) {
-        this.snake = snake;
-    }
-
     public void nativeKeyPressed(NativeKeyEvent e) {
         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
             try {
@@ -67,6 +61,6 @@ public class Input implements NativeKeyListener {
             System.err.println(ex.getMessage());
             System.exit(1);
         }
-        GlobalScreen.addNativeKeyListener(new Input(snake));
+        GlobalScreen.addNativeKeyListener(new Input());
     }
 }
