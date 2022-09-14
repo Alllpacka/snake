@@ -13,7 +13,6 @@ public class Main {
         } catch (Exception exception) {
             //TODO HELP
         }
-
         game.startGame();
     }
 }

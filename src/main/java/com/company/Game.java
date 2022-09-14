@@ -1,15 +1,17 @@
 package com.company;
 
+import java.io.IOException;
 import java.util.Date;
 
 public class Game implements Runnable {
     public final int width;
     public final int height;
-
+    public int score;
+    private Point coinPoint;
     public Area area;
     public Snake snake;
     private boolean gameOver;
-    private int timeBetweenTick = 200;
+    private int timeBetweenTick = 800;
 
     public Game() {
         this.width = 8;
@@ -26,16 +28,32 @@ public class Game implements Runnable {
         this.height = height;
     }
 
-    public void startGame() {
-        area = new Area(width, height);
+    private void printTitleText() {
+        System.out.println("  ____              _        _ \n" +
+                " / ___| _ __   __ _| | _____| |\n" +
+                " \\___ \\| '_ \\ / _` | |/ / _ \\ |\n" +
+                "  ___) | | | | (_| |   <  __/_|\n" +
+                " |____/|_| |_|\\__,_|_|\\_\\___(_)\n" +
+                "                               ");
+    }
 
+    public void startGame() {
+        printTitleText();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        area = new Area(width, height);
         spawnPlayer();
+        spawnCoin();
         gameLoop();
+        Input.startInputListener(snake);
     }
 
     private void spawnPlayer() {
-        snake = new Snake(new Point(width / 2, height / 2));
-        area.setField(snake.getHeadPoint(), State.Head);
+        snake = new Snake(new Point(width / 2, height / 2), area, this);
+        area.setField(snake.getHeadPoint(), Type.Head);
     }
 
     private void gameLoop() {
@@ -43,19 +61,47 @@ public class Game implements Runnable {
         gameLoop.start();
     }
 
-    private void tick(){
+    private void tick() {
+        move();
+        checkCoin();
         draw();
     }
 
     private void spawnCoin() {
-
+        coinPoint = getRandomPoint();
+        area.setField(coinPoint, Type.Coin);
     }
 
     private void gameOver() {
 
     }
 
+    private Point getRandomPoint() {
+        return new Point((int) (Math.random() * height), (int) (Math.random() * width));
+    }
+
+    private void move() {
+        snake.move(Direction.direction);
+        area.setField(snake.getHeadPoint(), Type.Head);
+    }
+
+    private void checkCoin() {
+        if (snake.getHeadPoint().getX() == coinPoint.getX() && snake.getHeadPoint().getY() == coinPoint.getY()) {
+            score++;
+            spawnCoin();
+        }
+    }
+
     private void draw() {
+        try {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println();
+        System.out.println("Score: " + score);
         drawEdge();
         for (Field[] row : area.getField()) {
             System.out.print("|");

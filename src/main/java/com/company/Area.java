@@ -8,13 +8,13 @@ public class Area {
 
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[i].length; j++) {
-                field[i][j] = new Field(State.Void);
+                field[i][j] = new Field(Type.Void);
             }
         }
     }
 
-    public void setField(Point point, State state) {
-        field[point.getX()][point.getY()].setState(state);
+    public void setField(Point point, Type type) {
+        field[point.getX()][point.getY()].setState(type);
     }
 
     public Field[][] getField() {
