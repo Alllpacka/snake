@@ -27,16 +27,24 @@ public class Input implements NativeKeyListener {
             System.exit(0);
         }
         if (e.getKeyCode() == NativeKeyEvent.VC_W || e.getKeyCode() == NativeKeyEvent.VC_UP) {
-            Direction.direction = Direction.Up;
+            if (Direction.checkDirection(Direction.Up)) {
+                Direction.direction = Direction.Up;
+            }
         }
         if (e.getKeyCode() == NativeKeyEvent.VC_A || e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
-            Direction.direction = Direction.Left;
+            if (Direction.checkDirection(Direction.Left)) {
+                Direction.direction = Direction.Left;
+            }
         }
         if (e.getKeyCode() == NativeKeyEvent.VC_S || e.getKeyCode() == NativeKeyEvent.VC_DOWN) {
-            Direction.direction = Direction.Down;
+            if (Direction.checkDirection(Direction.Down)) {
+                Direction.direction = Direction.Down;
+            }
         }
         if (e.getKeyCode() == NativeKeyEvent.VC_D || e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
-            Direction.direction = Direction.Right;
+            if (Direction.checkDirection(Direction.Right)) {
+                Direction.direction = Direction.Right;
+            }
         }
     }
 

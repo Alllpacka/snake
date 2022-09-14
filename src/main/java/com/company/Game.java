@@ -115,13 +115,13 @@ public class Game implements Runnable {
     }
 
     private void drawEdge() {
-        System.out.print("|");
+        System.out.print("+");
 
         for (int i = 0; i < width * 2; i++) {
             System.out.print("-");
         }
 
-        System.out.print("| \n");
+        System.out.print("+ \n");
     }
 
     @Override
