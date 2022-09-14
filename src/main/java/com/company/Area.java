@@ -4,7 +4,7 @@ public class Area {
     private Field[][] field;
 
     public Area(int width, int height) {
-        field = new Field[width][height];
+        field = new Field[height][width];
 
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[i].length; j++) {
@@ -14,7 +14,7 @@ public class Area {
     }
 
     public void setField(Point point, Type type) {
-        field[point.getX()][point.getY()].setState(type);
+        field[point.getY()][point.getX()].setState(type);
     }
 
     public Field[][] getField() {

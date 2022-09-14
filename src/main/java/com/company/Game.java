@@ -14,7 +14,7 @@ public class Game implements Runnable {
     private int timeBetweenTick = 800;
 
     public Game() {
-        this.width = 8;
+        this.width = 16;
         this.height = 8;
     }
 
@@ -77,16 +77,29 @@ public class Game implements Runnable {
     }
 
     private Point getRandomPoint() {
-        return new Point((int) (Math.random() * height), (int) (Math.random() * width));
+        Point point = new Point((int) (width * Math.random()), (int) (height * Math.random()));
+        for (Point p : snake.getBodyPoints()) {
+            if (p.equals(point)) {
+                return getRandomPoint();
+            }
+        }
+        if (snake.getHeadPoint().equals(point)) {
+            return getRandomPoint();
+        }
+        return point;
     }
 
     private void move() {
         snake.move(Direction.direction);
         area.setField(snake.getHeadPoint(), Type.Head);
+        for (Point p : snake.getBodyPoints()) {
+            area.setField(p, Type.Body);
+        }
     }
 
     private void checkCoin() {
-        if (snake.getHeadPoint().getX() == coinPoint.getX() && snake.getHeadPoint().getY() == coinPoint.getY()) {
+        if (snake.getHeadPoint().equals(coinPoint)) {
+            snake.grow();
             score++;
             spawnCoin();
         }
