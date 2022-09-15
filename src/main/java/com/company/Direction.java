@@ -5,7 +5,7 @@ public enum Direction {
 
     public static Direction direction = Direction.Right;
 
-    public Direction invertDirection(Direction direction) {
+    public static Direction invertDirection(Direction direction) {
         switch (direction) {
             case Left -> {
                 return Direction.Right;
@@ -24,11 +24,11 @@ public enum Direction {
         return Direction.Up;
     }
 
-    public boolean checkDirection(Direction direction) {
+    public static boolean checkDirection(Direction direction) {
         if (Main.game.snake.getBodyPoints().length == 0) {
             return true;
         }
 
-        return invertDirection(direction) == Direction.direction;
+        return invertDirection(direction) != Direction.direction;
     }
 }
