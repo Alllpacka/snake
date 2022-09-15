@@ -11,7 +11,10 @@ import java.util.logging.Logger;
 
 public class Input implements NativeKeyListener {
 
+    public static int keyCount = 0;
+
     public void nativeKeyPressed(NativeKeyEvent e) {
+        keyCount++;
         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
             try {
                 GlobalScreen.unregisterNativeHook();

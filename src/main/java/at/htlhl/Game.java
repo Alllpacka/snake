@@ -18,7 +18,7 @@ public class Game implements Runnable {
     public Area area;
     public Snake snake;
     public boolean gameOver;
-    private int timeBetweenTick = 400;
+    private int timeBetweenTick = 600;
 
     private Thread gameLoop;
 
@@ -160,7 +160,7 @@ public class Game implements Runnable {
         int userCount = 0;
         try {
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/snake", "snake", "python");
+                    "jdbc:mysql://192.168.8.121:3306/snake", "snake", "python");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("select * from users");
             while (rs.next()) {

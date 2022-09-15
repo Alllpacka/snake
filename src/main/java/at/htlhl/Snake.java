@@ -1,5 +1,7 @@
 package at.htlhl;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 
 public class Snake {
@@ -96,6 +98,14 @@ public class Snake {
         var scan = new java.util.Scanner(System.in);
         char input = ' ';
         do {
+            try {
+                Robot robot = new Robot();
+                for (int i = 0; i < Input.keyCount; i++) {
+                    robot.keyPress(KeyEvent.VK_BACK_SPACE);
+                }
+            } catch (AWTException e) {
+                System.out.println(e.getMessage());
+            }
             System.out.println("Drücke 0 um zu beenden");
             System.out.println("Drücke 1 um neuzustarten");
             input = scan.nextLine().charAt(0);
