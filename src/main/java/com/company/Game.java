@@ -11,7 +11,7 @@ public class Game implements Runnable {
     public Area area;
     public Snake snake;
     public boolean gameOver;
-    private int timeBetweenTick = 800;
+    private int timeBetweenTick = 400;
 
     public Game() {
         this.width = 16;
