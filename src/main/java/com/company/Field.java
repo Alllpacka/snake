@@ -1,17 +1,17 @@
 package com.company;
 
 public class Field {
-    private State state;
+    private Type state;
 
-    public Field(State state) {
-        this.state = state;
+    public Field(Type type) {
+        this.state = type;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setState(Type type) {
+        this.state = type;
     }
 
-    public State getState() {
+    public Type getState() {
         return state;
     }
 

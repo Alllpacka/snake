@@ -9,6 +9,16 @@ public class Point {
         this.y = y;
     }
 
+    public boolean equals(Object other){
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Point otherPoint)) {
+            return false;
+        }
+        return otherPoint.getX() == this.getX() && otherPoint.getY() == this.getY();
+    }
+
     public void setX(int x) {
         this.x = Math.min(x, Main.game.width - 1);
     }

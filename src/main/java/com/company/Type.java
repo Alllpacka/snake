@@ -1,5 +1,5 @@
 package com.company;
 
-public enum State {
+public enum Type {
     Void, Head, Body, Coin;
 }
