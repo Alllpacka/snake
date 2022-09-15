@@ -1,12 +1,19 @@
 package com.company;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Date;
 
 public class Game implements Runnable {
     public final int width;
     public final int height;
     public int score;
+
+    // ID, Username, Password, Score
+    public String[][] users;
     private Point coinPoint;
     public Area area;
     public Snake snake;
@@ -38,7 +45,6 @@ public class Game implements Runnable {
     }
 
     public void startGame() {
-        printTitleText();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -117,26 +123,73 @@ public class Game implements Runnable {
         }
         System.out.println();
         System.out.println("Score: " + score);
-        drawEdge();
+        drawLine(10);
+        int i = 0;
         for (Field[] row : area.getField()) {
             System.out.print("|");
             for (Field field : row) {
                 System.out.print(field.translateState());
                 System.out.print(" ");
             }
-            System.out.println("|");
+            System.out.print("| ");
+            if (i < users.length) {
+                System.out.print(users[i][0] + " - ");
+                System.out.print(users[i][1] + " - ");
+                System.out.print(users[i][3]);
+                int length = users[i][0].length() + users[i][1].length() + users[i][3].length() + 6;
+                for (int j = 0; j < 19-length; j++) {
+                    System.out.print(" ");
+                }
+                System.out.print("|");
+            } else {
+                for (int j = 0; j < 19; j++) {
+                    System.out.print(" ");
+                }
+                System.out.print("|");
+            }
+            System.out.println();
+            i++;
         }
-        drawEdge();
+        drawLine(10);
     }
 
-    private void drawEdge() {
+    private void drawLine(int length){
         System.out.print("+");
-
         for (int i = 0; i < width * 2; i++) {
             System.out.print("-");
         }
+        System.out.print("+");
 
+        for (int i = 0; i < length * 2; i++) {
+            System.out.print("-");
+        }
         System.out.print("+ \n");
+    }
+
+    public void connect() {
+        int userCount = 0;
+        try {
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/snake", "snake", "python");
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from users");
+            while (rs.next()) {
+                userCount++;
+            }
+            users = new String[userCount][4];
+            rs = stmt.executeQuery("select * from users");
+            int currentUser = 0;
+            while (rs.next()) {
+                users[currentUser][0] = String.valueOf(rs.getInt(1));
+                users[currentUser][1] = rs.getString(2);
+                users[currentUser][2] = rs.getString(3);
+                users[currentUser][3] = rs.getString(4);
+                currentUser++;
+            }
+            con.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

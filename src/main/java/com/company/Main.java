@@ -2,8 +2,10 @@ package com.company;
 
 public class Main {
     public static Game game;
+    public static Menu menu;
 
     public static void main(String[] args) {
+        menu = new Menu();
         try {
             switch (args.length) {
                 case 0 -> game = new Game();
@@ -25,6 +27,7 @@ public class Main {
             System.out.println("-> zwei Parameter: Länge x Breite");
             System.exit(0);
         }
+        game.connect();
         game.startGame();
     }
 }
