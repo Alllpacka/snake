@@ -1,6 +1,8 @@
 package at.htlhl;
 
 import java.io.Console;
+import java.io.File;
+import java.net.URISyntaxException;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -33,18 +35,27 @@ public class Menu implements Runnable {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println();
-        var scan = new java.util.Scanner(System.in);
-        char input = ' ';
-        do {
-            System.out.println("Hast du bereits ein Konto? (y/n)");
-            input = scan.nextLine().charAt(0);
-            if (input == 'n') {
-                newUser();
-            } else if (input == 'y') {
-                login();
-            }
-        } while (!(input == 'n' || input == 'y'));
+        if (!checkConfig()) {
+            System.out.println();
+            var scan = new java.util.Scanner(System.in);
+            char input = ' ';
+            do {
+                System.out.println("Hast du bereits ein Konto? (y/n)");
+                input = scan.nextLine().charAt(0);
+                if (input == 'n') {
+                    newUser();
+                } else if (input == 'y') {
+                    login();
+                }
+            } while (!(input == 'n' || input == 'y'));
+        } else {
+            System.out.println("Viel Spaß! ");
+        }
+    }
+
+    private boolean checkConfig(){
+        File file = new File(getClass().getResource("/login.conf").getFile());
+        return file.exists();
     }
 
     private void newUser(){
@@ -69,7 +80,7 @@ public class Menu implements Runnable {
             System.out.println("Gib ein neues Passwort ein: ");
             try {
                 if (java.lang.System.console() != null) {
-                    password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.UTF_8.encode(CharBuffer.wrap(System.console().readPassword())).array()));
+                    password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.US_ASCII.encode(CharBuffer.wrap(System.console().readPassword())).array()));
                 } else {
                     password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(scan.nextLine().getBytes()));
                 }
@@ -80,7 +91,7 @@ public class Menu implements Runnable {
             String repeat;
             try {
                 if (java.lang.System.console() != null) {
-                    repeat = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.UTF_8.encode(CharBuffer.wrap(System.console().readPassword())).array()));
+                    repeat = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.US_ASCII.encode(CharBuffer.wrap(System.console().readPassword())).array()));
                 } else {
                     repeat = bytesToHex(MessageDigest.getInstance("SHA-256").digest(scan.nextLine().getBytes()));
                 }
@@ -97,6 +108,7 @@ public class Menu implements Runnable {
                 valid = false;
             }
         } while (!valid);
+        sqlPush("INSERT INTO users (username, password, score) VALUES ('"  + username + "', '" + password + "', 0)");
         login();
     }
 
@@ -125,7 +137,7 @@ public class Menu implements Runnable {
             System.out.println("Passwort: ");
             try {
                 if (java.lang.System.console() != null) {
-                    password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.UTF_8.encode(CharBuffer.wrap(System.console().readPassword())).array()));
+                    password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.US_ASCII.encode(CharBuffer.wrap(System.console().readPassword())).array()));
                 } else {
                     password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(scan.nextLine().getBytes()));
                 }
@@ -166,7 +178,7 @@ public class Menu implements Runnable {
     private String sqlPull(String sql){
         try {
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
+                    "jdbc:mysql://192.168.8.121:3306/snake", "snake", "python");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             rs.next();
@@ -175,8 +187,15 @@ public class Menu implements Runnable {
             return null;
         }
     }
-    private void sqlPush(){
-
+    private void sqlPush(String sql){
+        try {
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://192.168.8.121:3306/snake", "snake", "python");
+            Statement stmt = con.createStatement();
+            stmt.execute(sql);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
