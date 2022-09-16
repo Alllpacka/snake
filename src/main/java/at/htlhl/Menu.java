@@ -25,8 +25,8 @@ public class Menu implements Runnable {
             " |____/|_| |_|\\__,_|_|\\_\\___(_)\n" +
             "                               ";
 
-    private String username;
-    private String password = "";
+    public String username;
+    public String password = "";
 
     public Menu() {
         printMenu(false);
@@ -58,7 +58,7 @@ public class Menu implements Runnable {
                 }
             } while (!(input == 'n' || input == 'y'));
         } else {
-            File file = new File("C:\\Users\\marku\\AppData\\Roaming\\snake.conf");
+            File file = new File("C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming\\snake.conf");
             java.util.Scanner scan = null;
             try {
                 scan = new java.util.Scanner(file);
@@ -80,12 +80,13 @@ public class Menu implements Runnable {
                 // Passwort ungültig
                 printMenu(true);
             }
+            username = lines.get(0);
             System.out.println("Viel Spaß! ");
         }
     }
 
     private boolean checkConfig() {
-        File file = new File("C:\\Users\\marku\\AppData\\Roaming\\snake.conf");
+        File file = new File("C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming\\snake.conf");
         return file.exists();
     }
 
@@ -102,6 +103,10 @@ public class Menu implements Runnable {
             }
             if (username.length() < 1) {
                 System.out.println("Benutzername zu kurz. ");
+                valid = false;
+            }
+            if (sqlPull("SELECT username FROM users WHERE username='" + username + "'") != null) {
+                System.out.println("Benutzer existiert bereits. ");
                 valid = false;
             }
         } while (!valid);
@@ -195,7 +200,7 @@ public class Menu implements Runnable {
     }
 
     private void writeConfigFile(){
-        Path file = Paths.get("C:\\Users\\marku\\AppData\\Roaming\\snake.conf");
+        Path file = Paths.get("C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming\\snake.conf");
         try {
             var writer = Files.newBufferedWriter(file);
             writer.write(username + "\n" + password);

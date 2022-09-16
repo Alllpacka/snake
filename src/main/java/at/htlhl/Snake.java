@@ -2,6 +2,10 @@ package at.htlhl;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.LinkedList;
 
 public class Snake {
@@ -95,6 +99,7 @@ public class Snake {
                 " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |  |_|\n" +
                 "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|  (_)\n" +
                 "                                                      ");
+        checkHighScore();
         var scan = new java.util.Scanner(System.in);
         char input = ' ';
         do {
@@ -117,5 +122,20 @@ public class Snake {
                 Main.game.startGame();
             }
         } while (input != '1');
+    }
+
+    private void checkHighScore(){
+        try {
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT score FROM users WHERE username='" + Main.menu.username + "'");
+            rs.next();
+            if (rs.getInt(1) < Main.game.score) {
+                stmt.execute("UPDATE users SET score = " + Main.game.score + " WHERE username = '" + Main.menu.username + "'");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
