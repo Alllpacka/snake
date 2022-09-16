@@ -1,16 +1,21 @@
 package at.htlhl;
 
-import java.io.Console;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Menu implements Runnable {
 
@@ -21,22 +26,27 @@ public class Menu implements Runnable {
             " |____/|_| |_|\\__,_|_|\\_\\___(_)\n" +
             "                               ";
 
-    public Menu(){
-        printMenu();
+    private String username;
+    private String password = "";
+
+    public Menu() {
+        printMenu(false);
         System.out.println();
     }
 
-    public void printMenu(){
-        for (char c : logo.toCharArray()) {
-            System.out.print(c);
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+    public void printMenu(boolean ignoreConfig) {
+        if (!ignoreConfig) {
+            for (char c : logo.toCharArray()) {
+                System.out.print(c);
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
-        if (!checkConfig()) {
-            System.out.println();
+        System.out.println();
+        if (!checkConfig() || ignoreConfig) {
             var scan = new java.util.Scanner(System.in);
             char input = ' ';
             do {
@@ -49,19 +59,39 @@ public class Menu implements Runnable {
                 }
             } while (!(input == 'n' || input == 'y'));
         } else {
+            File file = new File(getClass().getResource("/login.conf").getFile());
+            java.util.Scanner scan = null;
+            try {
+                scan = new java.util.Scanner(file);
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+            ArrayList<String> lines = new ArrayList<>();
+            while (scan.hasNextLine()) {
+                lines.add(scan.nextLine());
+            }
+            scan.close();
+
+            if (!(lines.get(0).equals(sqlPull("SELECT username FROM users WHERE username='" + lines.get(0) + "'")))) {
+                // Benutzer existiert nicht
+                printMenu(true);
+            } else if (lines.size() < 2) {
+                printMenu(true);
+            } else if (!(lines.get(1).equals(sqlPull("SELECT password FROM users WHERE username='" + lines.get(0) + "' AND " + "password='" + lines.get(1) + "'")))) {
+                // Passwort ungültig
+                printMenu(true);
+            }
             System.out.println("Viel Spaß! ");
         }
     }
 
-    private boolean checkConfig(){
+    private boolean checkConfig() {
         File file = new File(getClass().getResource("/login.conf").getFile());
         return file.exists();
     }
 
-    private void newUser(){
+    private void newUser() {
         var scan = new java.util.Scanner(System.in);
-        String username;
-        String password = "";
         boolean valid;
         do {
             System.out.println("Gib einen neuen Benutzernamen ein: ");
@@ -108,18 +138,18 @@ public class Menu implements Runnable {
                 valid = false;
             }
         } while (!valid);
-        sqlPush("INSERT INTO users (username, password, score) VALUES ('"  + username + "', '" + password + "', 0)");
+        sqlPush("INSERT INTO users (username, password, score) VALUES ('" + username + "', '" + password + "', 0)");
         login();
     }
 
-    private void login(){
+    private void login() {
         var scan = new java.util.Scanner(System.in);
 
         System.out.format("+---------------------+%n");
         System.out.format("| Login               |%n");
         System.out.format("+---------------------+%n");
 
-        String username;
+        
         boolean valid;
         do {
             System.out.println("Benutzername: ");
@@ -131,7 +161,6 @@ public class Menu implements Runnable {
             }
         } while (!valid);
 
-        String password = "";
         valid = false;
         do {
             System.out.println("Passwort: ");
@@ -160,14 +189,34 @@ public class Menu implements Runnable {
                 System.out.println("Ungültige Eingabe. ");
                 valid = false;
             }
+            if (remember == 'y') {
+                writeConfigFile();
+            }
         } while (!valid);
+    }
+
+    private void writeConfigFile(){
+        Path resources = null;
+        try {
+            resources = Paths.get(getClass().getResource("/").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        Path file = Paths.get(resources.toAbsolutePath() + "/login.conf");
+        try {
+            var writer = Files.newBufferedWriter(file);
+            writer.write(username + "\n" + password);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (int i = 0; i < hash.length; i++) {
             String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) {
+            if (hex.length() == 1) {
                 hexString.append('0');
             }
             hexString.append(hex);
@@ -175,22 +224,24 @@ public class Menu implements Runnable {
         return hexString.toString();
     }
 
-    private String sqlPull(String sql){
+    private String sqlPull(String sql) {
         try {
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://192.168.8.121:3306/snake", "snake", "python");
+                    "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getString(1);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
-    private void sqlPush(String sql){
+
+    private void sqlPush(String sql) {
         try {
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://192.168.8.121:3306/snake", "snake", "python");
+                    "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
             Statement stmt = con.createStatement();
             stmt.execute(sql);
         } catch (Exception e) {
