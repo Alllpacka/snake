@@ -107,13 +107,13 @@ public class Menu implements Runnable {
         System.out.format("| Login               |%n");
         System.out.format("+---------------------+%n");
 
-        /*String username;
+        String username;
         boolean valid;
         do {
             System.out.println("Benutzername: ");
             username = scan.nextLine();
             valid = true;
-            if (!(username.equals(sqlPull("SELECT FROM users WHERE username = '" + username + "'", 2)))) {
+            if (!(username.equals(sqlPull("SELECT username FROM users WHERE username='" + username + "'")))) {
                 System.out.println("Benutzer existiert nicht. ");
                 valid = false;
             }
@@ -133,7 +133,7 @@ public class Menu implements Runnable {
                 System.out.println(e.getMessage());
             }
             valid = true;
-            if (!(password.equals(sqlPull("SELECT FROM users WHERE username = '" + username + "' " + "passsword = '" + password + "'", 3)))) {
+            if (!(password.equals(sqlPull("SELECT password FROM users WHERE username='" + username + "' AND " + "password='" + password + "'")))) {
                 System.out.println("Passwort ist ungültig. ");
                 valid = false;
             }
@@ -148,7 +148,7 @@ public class Menu implements Runnable {
                 System.out.println("Ungültige Eingabe. ");
                 valid = false;
             }
-        } while (!valid);*/
+        } while (!valid);
     }
 
     private static String bytesToHex(byte[] hash) {
@@ -163,14 +163,14 @@ public class Menu implements Runnable {
         return hexString.toString();
     }
 
-    private String sqlPull(String sql, int i){
+    private String sqlPull(String sql){
         try {
             Connection con = DriverManager.getConnection(
                     "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            con.close();
-            return rs.getString(i);
+            rs.next();
+            return rs.getString(1);
         } catch (Exception e) {
             return null;
         }
