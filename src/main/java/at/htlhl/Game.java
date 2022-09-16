@@ -160,7 +160,7 @@ public class Game implements Runnable {
         int userCount = 0;
         try {
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://192.168.8.121:3306/snake", "snake", "python");
+                    "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("select * from users");
             while (rs.next()) {

@@ -1,9 +1,14 @@
 package at.htlhl;
 
+import java.io.Console;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class Menu implements Runnable {
 
@@ -63,13 +68,11 @@ public class Menu implements Runnable {
         do {
             System.out.println("Gib ein neues Passwort ein: ");
             try {
-
                 if (java.lang.System.console() != null) {
                     password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.UTF_8.encode(CharBuffer.wrap(System.console().readPassword())).array()));
                 } else {
                     password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(scan.nextLine().getBytes()));
                 }
-                System.out.println(password);
             } catch (NoSuchAlgorithmException e) {
                 System.out.println(e.getMessage());
             }
@@ -98,12 +101,54 @@ public class Menu implements Runnable {
     }
 
     private void login(){
+        var scan = new java.util.Scanner(System.in);
+
         System.out.format("+---------------------+%n");
         System.out.format("| Login               |%n");
         System.out.format("+---------------------+%n");
-        System.out.println("Benutzername: ");
-        System.out.println("Passwort: ");
-        System.out.println("Login speichern? (y/n)");
+
+        /*String username;
+        boolean valid;
+        do {
+            System.out.println("Benutzername: ");
+            username = scan.nextLine();
+            valid = true;
+            if (!(username.equals(sqlPull("SELECT FROM users WHERE username = '" + username + "'", 2)))) {
+                System.out.println("Benutzer existiert nicht. ");
+                valid = false;
+            }
+        } while (!valid);
+
+        String password = "";
+        valid = false;
+        do {
+            System.out.println("Passwort: ");
+            try {
+                if (java.lang.System.console() != null) {
+                    password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(StandardCharsets.UTF_8.encode(CharBuffer.wrap(System.console().readPassword())).array()));
+                } else {
+                    password = bytesToHex(MessageDigest.getInstance("SHA-256").digest(scan.nextLine().getBytes()));
+                }
+            } catch (NoSuchAlgorithmException e) {
+                System.out.println(e.getMessage());
+            }
+            valid = true;
+            if (!(password.equals(sqlPull("SELECT FROM users WHERE username = '" + username + "' " + "passsword = '" + password + "'", 3)))) {
+                System.out.println("Passwort ist ungültig. ");
+                valid = false;
+            }
+        } while (!valid);
+
+        char remember;
+        do {
+            System.out.println("Login speichern? (y/n)");
+            remember = scan.nextLine().charAt(0);
+            valid = true;
+            if (remember != 'y' && remember != 'n') {
+                System.out.println("Ungültige Eingabe. ");
+                valid = false;
+            }
+        } while (!valid);*/
     }
 
     private static String bytesToHex(byte[] hash) {
@@ -118,8 +163,20 @@ public class Menu implements Runnable {
         return hexString.toString();
     }
 
-    public void getUserInput(){
-        var scan = new java.util.Scanner(System.in);
+    private String sqlPull(String sql, int i){
+        try {
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://branmark.ddns.net:3306/snake", "snake", "python");
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            con.close();
+            return rs.getString(i);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    private void sqlPush(){
+
     }
 
     @Override
