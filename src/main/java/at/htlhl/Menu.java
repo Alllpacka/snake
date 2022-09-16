@@ -3,7 +3,6 @@ package at.htlhl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -59,7 +58,7 @@ public class Menu implements Runnable {
                 }
             } while (!(input == 'n' || input == 'y'));
         } else {
-            File file = new File(getClass().getResource("/login.conf").getFile());
+            File file = new File("C:\\Users\\marku\\AppData\\Roaming\\snake.conf");
             java.util.Scanner scan = null;
             try {
                 scan = new java.util.Scanner(file);
@@ -72,10 +71,10 @@ public class Menu implements Runnable {
             }
             scan.close();
 
-            if (!(lines.get(0).equals(sqlPull("SELECT username FROM users WHERE username='" + lines.get(0) + "'")))) {
-                // Benutzer existiert nicht
+            if (lines.size() < 1) {
                 printMenu(true);
-            } else if (lines.size() < 2) {
+            } else if (!(lines.get(0).equals(sqlPull("SELECT username FROM users WHERE username='" + lines.get(0) + "'")))) {
+                // Benutzer existiert nicht
                 printMenu(true);
             } else if (!(lines.get(1).equals(sqlPull("SELECT password FROM users WHERE username='" + lines.get(0) + "' AND " + "password='" + lines.get(1) + "'")))) {
                 // Passwort ungültig
@@ -86,7 +85,7 @@ public class Menu implements Runnable {
     }
 
     private boolean checkConfig() {
-        File file = new File(getClass().getResource("/login.conf").getFile());
+        File file = new File("C:\\Users\\marku\\AppData\\Roaming\\snake.conf");
         return file.exists();
     }
 
@@ -196,13 +195,7 @@ public class Menu implements Runnable {
     }
 
     private void writeConfigFile(){
-        Path resources = null;
-        try {
-            resources = Paths.get(getClass().getResource("/").toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        Path file = Paths.get(resources.toAbsolutePath() + "/login.conf");
+        Path file = Paths.get("C:\\Users\\marku\\AppData\\Roaming\\snake.conf");
         try {
             var writer = Files.newBufferedWriter(file);
             writer.write(username + "\n" + password);
@@ -233,7 +226,6 @@ public class Menu implements Runnable {
             rs.next();
             return rs.getString(1);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }
