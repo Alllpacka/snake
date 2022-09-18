@@ -1,11 +1,14 @@
 package at.htlhl;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Game implements Runnable {
     public final int width;
@@ -18,9 +21,10 @@ public class Game implements Runnable {
     public Area area;
     public Snake snake;
     public boolean gameOver;
-    private int timeBetweenTick = 600;
 
-    private Thread gameLoop;
+    private Thread thread;
+
+    private int timeBetweenTicks = 400;
 
     public Game() {
         this.width = 16;
@@ -50,9 +54,14 @@ public class Game implements Runnable {
         area = new Area(width, height);
         spawnPlayer();
         spawnCoin();
-        gameLoop();
+        thread = new Thread(this);
+        thread.start();
         Input.startInputListener();
         this.gameOver = false;
+    }
+
+    public void stopGame(){
+        thread.interrupt();
     }
 
     public void spawnPlayer() {
@@ -60,19 +69,10 @@ public class Game implements Runnable {
         area.setField(snake.getHeadPoint(), Type.Head);
     }
 
-    private void gameLoop() {
-        if (gameLoop == null) {
-            gameLoop = new Thread(this);
-            gameLoop.start();
-        }
-    }
-
     private void tick() {
         move();
-        if (!gameOver) {
-            checkCoin();
-            draw();
-        }
+        checkCoin();
+        draw();
     }
 
     private void spawnCoin() {
@@ -113,7 +113,11 @@ public class Game implements Runnable {
         try {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            try {
+                throw new RuntimeException(e);
+            } catch (Exception ex) {
+
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -178,24 +182,30 @@ public class Game implements Runnable {
             }
             con.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Main.menu.printLogo();
+            System.out.println();
+            users = new String[0][0];
+            System.out.println("Verbindung zum Server konnte nicht aufgebaut werden. ");
+            var scan = new java.util.Scanner(System.in);
+            char input = ' ';
+            do {
+                System.out.println("Im Offline-Modus starten? (y/n)");
+                input = scan.nextLine().charAt(0);
+                if (input == 'n') {
+                    System.exit(0);
+                }
+            } while (input != 'y');
         }
     }
 
     @Override
     public void run() {
-
-        // TODO Bitte Gameclock ändern, bzw. fixen
-        Date startTime = new Date();
-        Date currentTime;
-
         while (!gameOver) {
-            System.out.print("");
-            currentTime = new Date();
-
-            if ((currentTime.getTime() - startTime.getTime()) >= timeBetweenTick) {
-                startTime.setTime(startTime.getTime() + timeBetweenTick);
+            try {
                 tick();
+                Thread.sleep(timeBetweenTicks);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }

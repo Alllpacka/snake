@@ -93,6 +93,7 @@ public class Snake {
 
     private void gameOver(){
         Main.game.gameOver = true;
+        Main.game.stopGame();
         System.out.println("   ____                         ___                 _ \n" +
                 "  / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __| |\n" +
                 " | |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__| |\n" +
@@ -103,14 +104,14 @@ public class Snake {
         var scan = new java.util.Scanner(System.in);
         char input = ' ';
         do {
-            try {
+            /*try {
                 Robot robot = new Robot();
                 for (int i = 0; i < Input.keyCount; i++) {
                     robot.keyPress(KeyEvent.VK_BACK_SPACE);
                 }
             } catch (AWTException e) {
                 System.out.println(e.getMessage());
-            }
+            }*/
             System.out.println("Drücke 0 um zu beenden");
             System.out.println("Drücke 1 um neuzustarten");
             input = scan.nextLine().charAt(0);
@@ -135,7 +136,7 @@ public class Snake {
                 stmt.execute("UPDATE users SET score = " + Main.game.score + " WHERE username = '" + Main.menu.username + "'");
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("INFO: Highscore kann nicht im Offline-Modus gespeichert werden. ");
         }
     }
 }

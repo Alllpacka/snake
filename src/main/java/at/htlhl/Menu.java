@@ -28,21 +28,27 @@ public class Menu implements Runnable {
     public String username;
     public String password = "";
 
-    public Menu() {
-        printMenu(false);
-        System.out.println();
+    public Menu(boolean connected) {
+        if (connected) {
+            printMenu(false);
+            System.out.println();
+        }
+    }
+
+    public void printLogo(){
+        for (char c : logo.toCharArray()) {
+            System.out.print(c);
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void printMenu(boolean ignoreConfig) {
         if (!ignoreConfig) {
-            for (char c : logo.toCharArray()) {
-                System.out.print(c);
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            printLogo();
         }
         System.out.println();
         if (!checkConfig() || ignoreConfig) {
